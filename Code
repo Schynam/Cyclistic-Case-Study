@@ -1,0 +1,444 @@
+## Import Data ##
+
+#The SQL Statement:
+
+USE [Cyclistic Bike-Share]
+GO
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual INTO [Cyclistic_Bike-Share_2023] FROM dbo.[202301] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202302] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202303] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202304] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202305] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202306] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202307] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202308] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[202309] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[2023010] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[2023011] UNION ALL
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.[2023012]
+
+## Identify and remove NULL Values from the table  ##
+
+USE [Cyclistic Bike-Share]
+GO
+SELECT *
+FROM dbo.[Cyclistic_Bike-Share_2023]
+WHERE
+ride_id IS NULL
+OR rideable_type IS NULL
+OR started_at IS NULL
+OR ended_at IS NULL
+OR start_station_name IS NULL
+OR end_station_name IS NULL
+OR member_casual IS NULL;
+
+(1387808 rows affected)
+Completion time: 2024-12-13T22:43:52.2707580-06:00
+
+
+## New Table created and deleted NULL values
+
+USE [Cyclistic Bike-Share]
+GO
+SELECT * INTO Bike_Share_2023
+FROM dbo.[Cyclistic_Bike-Share_2023]
+USE [Cyclistic Bike-Share]
+GO
+DELETE
+FROM dbo.[Bike_Share_2023]
+WHERE
+ride_id IS NULL
+OR rideable_type IS NULL
+OR started_at IS NULL
+OR ended_at IS NULL
+OR start_station_name IS NULL
+OR end_station_name IS NULL
+OR member_casual IS NULL;
+
+
+
+## Removing Duplicate Records ##
+
+SELECT ,
+COUNT() AS duplicates
+FROM dbo.[Bike_Share_2023]
+GROUP BY
+ride_id
+, rideable_type
+, started_at
+, ended_at
+, start_station_name
+, end_station_name
+, member_casual
+HAVING COUNT(*) > 1;
+
+No duplicates were found
+(0 rows affected)
+Completion time: 2024-12-13T22:56:53.4049886-06:00
+
+
+
+```{# Installing all necessary packages}
+install.packages(“tidyverse”)
+install.packages(“ggplot2”)
+install.packages(“data.table”)
+install.packages(“readr”)
+install.packages(“janitor”)
+install.packages(“skimr”)
+install.packages(“dplyr”)
+install.packages(“lubridate”)
+install.packages(“tidyr”)
+install.packages(“RODBC”)
+install.packages(“tibble”)
+```
+```{ r # Loading the Libraries}
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+library(readr)
+library(janitor)
+library(skimr)
+library(dplyr, warn.conflicts = FALSE)
+library(lubridate)
+library(tidyr)
+library(RODBC)
+library(conflicted)
+library(tibble)
+```
+```{ r # Connection to SQLSEXPRESS - Opening RODBC channel }
+conn <- odbcDriverConnect(‘driver={SQL Server};server=DESKTOP-CVIM8UA\SQLEXPRESS;database=Cyclistic Bike-Share;trusted_connection=true’)
+# Setting default choices
+conflict_prefer(“filter”, “dplyr”)
+conflict_prefer(“lag”, “dplyr”)
+conflicts_prefer(data.table::wday)
+```
+```{ r # Step 1: Collect Data from the cleaned table Bike_Share_2023 from the Cyclistic Bike-Share database}
+year_2023 <- sqlQuery(conn, ‘SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual FROM dbo.Bike_Share_2023’)
+# Further cleanup of the data frame
+year_2023 <- year_2023[!(year_2023$start_station_name ==  "HQ QR" | year_2023$ride_length<0),] 
+year_2023 <- year_2023[!(year_2023$start_station_name ==  "TEST" | year_2023$ride_length<0),] 
+year_2023 <- year_2023[!(year_2023$start_station_name ==  "Test" | year_2023$ride_length<0),] 
+year_2023 <- year_2023[!(year_2023$start_station_name ==  "test" | year_2023$ride_length<0),] 
+
+summary(year_2023)
+
+```
+
+
+```{# Step 2: As mentioned above, I have uploaded and cleaned the data in SQLEXPRESS. Here I verify the Column names and inspect the data frames.}
+colnames(year_2023)
+str(year_2023)
+```
+
+
+```{# Step 3 Preparing for Analysis}
+nrow(year_2023)
+4332069 rows in the dataframe
+dim(year_2023)
+4332069 and 7 dimensions
+
+```{ # Working on the date stamp of the rides. To properly aggregate 
+ ride data according to their [dates and time.]( https://sparkbyexamples.com/r-programming/dates-and-times-in-r/) }
+year_2023$date <- as.Date(year_2023$started_at)
+
+year_2023$date <- as.Date(year_2023$ended_at)
+year_2023$time <- format(year_2023$started_at, format ="%H:%M")
+year_2023$month <- format(as.Date(year_2023$started_at), "%b %y")
+year_2023$day <- format(as.Date(year_2023$date), "%d") 
+year_2023$year <- format(as.Date(year_2023$date), "%Y") 
+year_2023$day_of_week <- format(as.Date(year_2023$date), "%A")
+```
+```{# Add "ride length" calculation to year_2023 in minutes, using the difftime(). [Date format here](https://docs.google.com/document/d/1TzCqk59_J23D5zNCvwAPSgK-5osp-wVnifsc-VOpCaI/template/preview) }
+
+# year_2023$ride_length <- difftime(year_2023$ended_at,year_2023$started_at)  
+year_2023$ride_length <- (as.double(difftime(year_2023$ended_at,year_2023$started_at)))/60  
+str(year_2023$ride_length)  
+
+# After all the formatting, we need to verify the columns of the table
+str(year_2023)
+
+# Next, we convert ride_length to numeric datatype from Factor type
+is.factor(year_2023$ride_length)
+year_2023$ride_length <- as.numeric(as.character(year_2023$ride_length))
+is.numeric(year_2023$ride_length)
+
+```
+
+```{r # Perform Descriptive Analysis. We need to know the average/median/maximum and minimum rides by Users in 2023 }
+
+mean(year_2023$ride_length)  
+median(year_2023$ride_length)  
+max(year_2023$ride_length)  
+min(year_2023$ride_length)
+
+# Statistical Summation of the trip length for all user types
+summary(year_2023$ride_length)  
+table(year_2023$month)  
+table(year_2023$member_casual) 
+
+```
+
+```{ r # This stage compares members and casual Bike-Share riders}
+
+aggregate(year_2023$ride_length ~ year_2023$member_casual, FUN = mean)  
+aggregate(year_2023$ride_length ~ year_2023$member_casual, FUN = median)  
+aggregate(year_2023$ride_length ~ year_2023$member_casual, FUN = max)  
+aggregate(year_2023$ride_length ~ year_2023$member_casual, FUN = min)  
+
+```
+
+
+```{r# Aggregating the ride_length for each Usertype }
+
+setNames(aggregate(ride_length ~ member_casual, year_2023, sum), c("member_casual", "total_ride_length(mins)"))
+
+``` 
+
+
+```{r # Summary of trip duration by customer type:}
+
+year_2023 %>%
+group_by(member_casual) %>%
+summarise(min_ride_length = min(ride_length), max_ride_length = max(ride_length), median_ride_length = median(ride_length), mean_ride_length = mean(ride_length))
+
+# Ordering Days of Week
+year_2023$day_of_week <- ordered(year_2023$day_of_week, levels=c("Sunday", "Monday",
+"Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+
+aggregate(year_2023$ride_length ~ year_2023$member_casual + year_2023$day_of_week,
+FUN = mean)
+
+```
+
+
+```{r # Ordering Months of the year 2023 }
+year_2023$month <- ordered(year_2023$month, levels=c("Jan 23", "Feb 23", "Mar 23", "Apr 23", "May 23", "Jun 23", "Jul 23", "Aug 23", "Sep 23", "Oct 23", "Nov 23", "Dec 23"))
+
+aggregate(year_2023$ride_length ~ year_2023$member_casual + year_2023$month,
+FUN = mean)
+``` 
+
+
+```{r # Total Trips by Membership Type and by ordered day of week }
+
+year_2023 %>%
+group_by(member_casual, day_of_week) %>%
+summarise(min_ride_length = min(ride_length), max_ride_length = max(ride_length), median_ride_length = median(ride_length), mean_ride_length = mean(ride_length))
+
+
+
+```{r #  Average Trips by Membership Type and by ordered Months  }
+
+# Average Rides per Month
+unique(year_2023$month)
+year_2023 %>% 
+group_by(member_casual, month) %>%
+summarise(month_ride_length = n(), average_ride_length = mean(ride_length)) %>% 
+arrange(member_casual, desc(month_ride_length)) %>%
+print(n = 24)
+
+```
+
+```{r # Max Trips by Membership Type and by ordered Months }
+unique(year_2023$month)
+year_2023 %>% 
+group_by(member_casual, month) %>%
+summarise(month_ride_length = n(), max_ride_length = max(ride_length)) %>% 
+arrange(member_casual, desc(month_ride_length)) %>%
+print(n=24)
+
+```
+
+
+```{r # Median Trips by Membership Type and by ordered Months }
+unique(year_2023$month)
+year_2023 %>% 
+group_by(member_casual, month) %>%
+summarise(month_ride_length = n(), median_ride_length = median(ride_length)) %>% 
+arrange(member_casual, desc(month_ride_length)) %>%
+print(n = 24)
+
+```
+
+
+```{r # Top ten Start Station Names }
+year_2023_start_riders <- sqlQuery(conn, 'SELECT TOP 10 COUNT(ride_id) AS number_of_riders, start_station_name, member_casual FROM dbo.Bike_Share_2023 GROUP BY start_station_name, member_casual ORDER BY COUNT(ride_id) DESC;')
+
+year_2023_start_riders %>%  top_n(10)
+
+```
+
+
+```{r # Top ten End Station Names }
+year_2023_end_riders <- sqlQuery(conn, 'SELECT TOP 10 COUNT(ride_id) AS number_of_riders, end_station_name, member_casual FROM dbo.Bike_Share_2023 GROUP BY end_station_name, member_casual ORDER BY COUNT(ride_id) DESC;')
+
+year_2023_end_riders %>% top_n(10)
+
+```
+
+```{r # Analyzing Started Times by the Riders }
+year_2023_started_times <- sqlQuery(conn, 'SELECT TOP 20 COUNT(ride_id) AS number_of_users,
+DATENAME(MONTH, started_at) AS commenced_month, 
+DATENAME(WEEKDAY, started_at) AS commenced_day,
+DATENAME(HOUR, started_at) AS commenced_hour, 
+member_casual
+FROM dbo.[Bike_Share_2023]
+GROUP BY
+member_casual,
+DATENAME(MONTH, started_at),
+DATENAME(WEEKDAY, started_at),
+DATENAME(HOUR, started_at)
+ORDER BY 
+COUNT(ride_id) DESC;')
+
+year_2023_started_times %>% tpo_n(20)
+
+```
+
+```{r # Analyzing Ended Times by the Riders }
+
+year_2023_ended_times <- sqlQuery(conn, 'SELECT TOP 20 COUNT(ride_id) AS number_of_users,
+DATENAME(MONTH, ended_at) AS ended_month, 
+DATENAME(WEEKDAY, ended_at) AS ended_day,
+DATENAME(HOUR, ended_at) AS ended_hour, 
+member_casual
+FROM dbo.[Bike_Share_2023]
+GROUP BY
+member_casual,
+DATENAME(MONTH, ended_at),
+DATENAME(WEEKDAY, ended_at),
+DATENAME(HOUR, ended_at)
+ORDER BY 
+COUNT(ride_id) DESC;')
+
+year_2023_ended_times %>% top_n(20)
+
+```
+
+
+Share
+
+The astute RStudio visualizations below present my findings for this study.
+
+
+```{r  # Creating a new [version of the data frame](https://docs.google.com/document/d/1TzCqk59_J23D5zNCvwAPSgK-5osp-wVnifsc-VOpCaI/template/preview) for the rest of the analysis. }
+
+year_2023_v2 <- year_2023
+
+nrow(year_2023_v2)
+
+ 
+
+```{r # Comparing member and casual users}
+
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual, FUN = mean)  
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual, FUN = median)  
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual, FUN = max)  
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual, FUN = min)  
+
+# Aggregating average ride time by day for members and casual riders and putting days of the week in order  
+
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual + year_2023_v2$day_of_week, FUN = mean)  
+
+# Months
+aggregate(year_2023_v2$ride_length ~ year_2023_v2$member_casual + year_2023_v2$month,
+FUN = mean)  
+
+```{r # Visualize By Rider Type's Weekly Total }
+
+year_2023_v2 %>%
+    group_by(member_casual, day_of_week) %>%                
+    summarise(number_of_rides = n()) %>%                     
+    arrange(number_of_rides, day_of_week) %>%
+    ggplot(aes(x = day_of_week, y = number_of_rides, fill = member_casual)) + 
+    geom_col(width=0.5, position = position_dodge(width=0.5)) +
+    scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+     labs(title = "Total Trips by Customer Type in Relation to the Days of the Week", 
+       x = "Day of the Week",
+       y = "Number of Rides")
+
+```
+
+```{r # Visualize By Rider Type's Monthly Total }  
+
+year_2023_v2 %>%
+   group_by(member_casual, month) %>%
+     summarise(number_of_rides= n()) %>%
+     arrange(number_of_rides, month) %>%
+     ggplot(aes(x = month, y = number_of_rides, fill = member_casual)) +
+     geom_col(width=0.5, position = position_dodge(width=0.5)) +
+     scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+     labs(title = "Total Trips by Customer Type in Relation to the Months of the Year 2023", 
+       x = "Months",
+       y = "Number of Rides")
+       
+``` 
+
+
+```{r # Average Number of Rides Per Week in Relation to Member Types }
+
+year_2023_v2 %>%
+     group_by(member_casual, day_of_week) %>%
+     summarise(number_of_rides = n()
+         ,average_duration = mean(ride_length)) %>%
+     arrange(member_casual, day_of_week) %>%
+     ggplot(aes(x = day_of_week, y = average_duration, fill = member_casual)) +
+     geom_col(width=0.7, position = position_dodge(width=0.7)) +
+     scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) + 
+     labs(title = "Average Trips by Customer Type in Relation to the Days of the Week", 
+       x = " Day of the Week",
+       y = "Average Number of Rides")
+       
+```
+
+
+ ```{r # Average Number of Rides Per Month in Relation to Member Types }
+
+year_2023_v2 %>%
+     group_by(member_casual, month) %>%
+     summarise(number_of_rides = n()
+         ,average_duration = mean(ride_length)) %>%
+     arrange(member_casual, month) %>%
+     ggplot(aes(x = month, y = average_duration, fill = member_casual)) +
+     geom_col(width=0.7, position = position_dodge(width=0.7)) +
+     scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) + 
+     labs(title = "Average Trips by Customer Type in Relation to the Months of the Year", 
+       x = " Months",
+       y = "Average Number of Rides")
+       
+```
+
+
+```{r # Max Number of Rides Per Week in Relation to Member Types }
+
+year_2023_v2 %>%
+     group_by(member_casual, day_of_week) %>%
+     summarise(number_of_rides = n()
+         ,max_duration = max(ride_length)) %>%
+     arrange(member_casual, day_of_week) %>%
+     ggplot(aes(x = day_of_week, y = max_duration, fill = member_casual)) +
+     geom_col(width=0.7, position = position_dodge(width=0.7)) +
+     scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) + 
+     labs(title = "Max Trips by Customer Type in Relation to the Days of the Week", 
+       x = " Day of the Week",
+       y = "Max Number of Rides")
+       
+``` 
+
+
+```{r # Max Number of Rides Per Month in Relation to Member Types }
+
+year_2023_v2 %>%
+     group_by(member_casual, month) %>%
+     summarise(number_of_rides = n()
+         ,max_duration = max(ride_length)) %>%
+     arrange(member_casual, month) %>%
+     ggplot(aes(x = month, y = max_duration, fill = member_casual)) +
+     geom_col(width=0.7, position = position_dodge(width=0.7)) +
+     scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) + 
+     labs(title = "Max Trips by Customer Type in Relation to the Months of the Year", 
+       x = " Months",
+       y = "Max Number of Rides")
+       
+```
+
