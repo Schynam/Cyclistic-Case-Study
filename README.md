@@ -1,8 +1,11 @@
 # Cyclistic-Case-Study
  Case Study: How does a Bike-Share Navigate Speedy Success?
 
-Adebola Peter Balogun
-2024-12-19
+Introduction
+
+
+This study is the Google Data Analytics Capstone project which utilizes public data that is available under a [license agreement] (https://divvybikes.com/data-license-agreement) and by which this study abides.
+
 
 Background
 Cyclistic Bike-Share is a fictional and flexible ride-share company with three (3) types of bikes – namely docked, electric and classical - that are available for riders to pick up from one of their 600 docking stations. Undocked bikes may be returned to any of the 600 stations. In addition to being an inclusive company offering bike rides to disabled customers, Cyclistic has over 5800 bicycles for its two types of clienteles: casual riders who purchase single-ride or day tickets and full members with annual memberships.  
