@@ -20,11 +20,7 @@ Business Plan: The future growth of Cyclistic Bike-Share hinges on maximizing it
 
 Stakeholders in this report:
 
-Cyclistic Executive Team
-
-Director of Marketing - Lily Moreno
-
-Cyclistic’s Marketing Analytics Team
+Cyclistic Executive Team, Director of Marketing - Lily Moreno, and Cyclistic’s Marketing Analytics Team
 
 
 
@@ -34,25 +30,25 @@ Prepare
 Cyclistic Bike-Share public data source is available at Index of “divvy-tripdata”. The data is under the  License Agreement between Bikeshare and the City of Chicago. For this Case Study, I have chosen to use the 2023 January to December Cyclistic trip data for this analysis.
 Although the company Cyclistic Bike-Share is fictional, I am still obligated to ensure that the 2023 dataset I have chosen for this study ROCCCs. Data that ROCCS is reliable, original, comprehensive, is current and also well-cited. 
 
+
 Cyclistic’s Data Structure
 
 The comma-delimited (.csv) files I downloaded have 15 columns that include the following: ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, start_lat, start_lng, end_lat, end_lng, and member_casual.
-While prepping the data, I needed to join all the .csv files together. I have chosen to use SQL Server queries for this step. Doing this within RStudio requires the rodbc package!
-I prepared the 2023 .CSV files by creating a database called “Cyclistic Bike-Share”. I imported all 12 .CSV files and merged them into a table named “Cyclistic_Bike-Share_2023”. While importing the flat files into SQLEXPRESS, I verified and changed the datatypes of the following columns: ride_id(nvarchar(50)), rideable_type(nvarchar(50)), started_at(datetime2), ended_at(datetime2), start_station_name(varchar(MAX)), end_station_name(varchar(MAX)), member_casual(nvarchar(50)).
+While prepping the data, I needed to join all the .csv files together. I have chosen to use SQL Server queries for this step. Doing this within RStudio requires the rodbc package.
+I prepared the 2023 .CSV files by creating a new database. I imported all 12 .CSV files and merged them into a new table. While importing the flat files into SQLEXPRESS, I verified and changed the datatypes of the following columns: ride_id(nvarchar(50)), rideable_type(nvarchar(50)), started_at(datetime2), ended_at(datetime2), start_station_name(varchar(MAX)), end_station_name(varchar(MAX)), member_casual(nvarchar(50)).
 
 
 
 Process
 
-Again, I started this phase of the Study using SQL Statements. I needed to identify and remove NULL Values from the table I created from the Prepare Phase - Cyclistic_Bike-Share_2023.
+Again, I started this phase of the Study using SQL Statements. I needed to identify and remove NULL Values from the table I created from the Prepare Phase.
 I wanted to keep the table created from the merged 12 flat (.csv) files intact. Therefore, I created a copy of that table, and from that copy, I deleted the NULL Values. The result showed 1387808 rows contained NULL Values. There was also the need to verify and remove duplicate records. But I found no duplicate records in the 2023 files.
 
 
 
 Analyze
 
-The first 3 Phases of this analysis were completed using Microsoft SQLEXPRESS - SQL Server 15.0.2130. Now it is time to continue the next phase in RStudio. I use the Desktop Version of RStudio 2024.12.0+467 “Kousa Dogwood” Release (cf37a3e5488c937207f992226d255be71f5e3f41, 2024-12-11) for windows.
-I have chosen to continue this exercise in the stable environment that RStudio offers and to take advantage of R Markdown in sharing my analysis to the Stakeholders. RStudio also provides a functionality for database connectivity. 
+The first 3 Phases of this analysis were completed using Microsoft SQLEXPRESS - SQL Server 15.0.2130. Now it is time to continue the next phase in RStudio. I have chosen to continue this exercise in the stable environment that RStudio offers and to take advantage of R Markdown in sharing my analysis to the Stakeholders. RStudio also provides a functionality for database connectivity. 
 In this phase, I need to aggregate the 2023 trip data, make calculations that help identify what trends and relationships the cleaned data presents. In order to analyze the 2023 ride-share data, I have to connect to SQLEXPRESS by opening an RODBC channel, as well as set default choices for RStudio. Thus, all required R packages like tidyverse, ggplot2, RODBC, lubridate, dplyr, tidyr, and readr were installed and loaded.
 
 Summary of the table
@@ -76,20 +72,20 @@ I also verified that there were just the two user types that will be considered 
 
 
 
-In order to properly aggregate ride-share data, I needed analyze the date stamps for the rides according to their dates and time (https://sparkbyexamples.com/r-programming/dates-and-times-in-r/), and format the calculated "ride length" using the difftime() ](https://docs.google.com/document/d/1TzCqk59_J23D5zNCvwAPSgK-5osp-wVnifsc-VOpCaI/template/preview)
+In order to properly aggregate ride-share data, I needed to analyze the date stamps for the rides according to their dates and time, and format the calculated "ride length" using the difftime().
 
 Aggregation of Cyclistic's 2023 Ride Data
 
 ![image](https://github.com/user-attachments/assets/6270f15d-1fca-41fb-9797-02ff37eaee24)
 
 
-The next stage aggregates the numbers of members and casual riders. Averagely, casual members spend more time on each trip compared to full members. The difference in time is almost 10 minutes averagely per ride. The median ride length also showed casual riders with the larger ride length of over 12 minutes per ride compared with the 8.6 minutes of full members.
+The next stage aggregates the numbers of members and casual riders. Averagely, casual members spend more time on each trip compared to full members. The difference in time is almost 10 minutes, averagely,  per ride. The median ride length also showed casual riders with the larger ride length of over 12 minutes per ride compared with the 8.6 minutes of full members.
 
 
 ![image](https://github.com/user-attachments/assets/c85aa761-fa0e-4b10-a288-64435028ea7d)
 
 
-Weekly ride summary were ordered by customer type in order to have an idea how the weekly and monthly numbers compare between the customer types. The numbers show that casual users spend more time averagely on their ride and the most preferred day for spending time on the bikes is Sundays. The second-best day of the week is Saturdays.
+Weekly ride summary were ordered by customer type to have an idea how the weekly and monthly numbers compare between the customer types. The numbers show that casual users spend more time averagely on their rides and the most preferred day for spending time on the bikes is Sundays. The second-best day of the week is Saturdays.
 
 Numbers by days of the week for each User Type
 
@@ -145,7 +141,7 @@ The analysis proceeds further to determining the busiest docking stations for th
 ![image](https://github.com/user-attachments/assets/31cc9552-b4c8-43f3-84a2-e3b4d85301df)
 
 
-Above we see the top ten (10) locations in the list for both the pickup and return of the bikes. It appears that majority of casual riders prefer a specific location (Streeter Dr & Grand Ave) to pick up and return their bikes.
+Above, we see the top ten (10) locations in the list for both the pickup and return of the bikes. It appears that majority of casual riders prefer a specific location (Streeter Dr & Grand Ave) to pick up and return their bikes.
 
 
 Share
@@ -157,7 +153,7 @@ The astute RStudio visualizations below present my findings for this study.
 ![image](https://github.com/user-attachments/assets/ddcaf237-195d-4584-bed0-113edbbcb61a)
 
 
-The graph above shows that casual users are most active during the weekends. Their rides are usually for leisure. Members started off very strong from the weekend and grow steadily during the week while choosing Stylistic's bikes as a means of transportation. Usage rises above 400,000 between Tuesday and Friday and taper off over the weekend with the weekend usage dropping to above 300,000 rides. For casual customers, they start slowly during the week and then see their usage increase also steadily from slightly below 200,000 rides on Mondays and Tuesdays to above 200,000 by Friday. Usage then rises above 300,000 rides during the weekend.
+The graph above shows that casual users are most active during the weekends. Their rides are usually for leisure. Members started off very strong from the weekend and grow steadily during the week while choosing Stylistic's bikes as a means of transportation. Usage rises above 400,000 between Tuesday and Friday and taper off over the weekend with the weekend usage dropping to above 300,000 rides. For casual customers, they start slowly during the week and then see their usage increase steadily from slightly below 200,000 rides on Mondays and Tuesdays to above 200,000 by Friday. Usage then rises above 300,000 rides during the weekend.
 
 Moreover, the trend is also showing that casual members spend averagely more time (about 10 more minutes) on the bikes than annual members do:
 
@@ -169,7 +165,7 @@ Moreover, the trend is also showing that casual members spend averagely more tim
 ![image](https://github.com/user-attachments/assets/c4584a76-640a-4cf1-9450-f19b82aed047)
 
 
-Monthly ride stats show casual riders with longer average ride shares all year round. The month of July recorded the largest average number of rides followed by the month May. [Statista.com](https://www.statista.com/statistics/1316398/top-summer-travel-months-us/) indicates that the leading months that people travel in the USA fall between the months of May and September. The 2023 bike ride shares in those months by both casual and full members speak to the seasonal nature of bike rides.
+Monthly ride stats show casual riders with longer average ride shares all year round. The month of July recorded the largest average number of rides followed by the month May. Statista.com (2022) indicates that the leading months that people travel in the USA fall between the months of May and September. The 2023 bike ride shares in those months by both casual and full members speak to the seasonal nature of bike rides.
 
 
 ![image](https://github.com/user-attachments/assets/1526c1da-a9d5-476f-9946-66b0c2f41ce4)
@@ -197,7 +193,7 @@ Observations
 
 
 1.	Casual members spend averagely 27.1 minutes per ride. Members spend 14 minutes averagely per ride.
-2.	Out of a total 4,332,003 members recorded by Cyclistic in the year 2023, members make 65% (or 2800098). While casual riders make 35% (or 1531905).
+2.	Out of a total 4,332,003 trips recorded by Cyclistic in the year 2023, members make 65% (or 2800098). While casual riders make 35% (or 1531905).
 3.	Major reason casual riders use Stylistic’s bikes is for leisure and do so majorly during the summer or warmer season.
 
 
@@ -206,7 +202,7 @@ Recommendations
 
 Cyclistic Bike-Share should launch a marketing campaign targeted at casual users:
 
-1.	The fact that casual users are recreational riders, the company should consider a thoughtful and strategic summer campaign that is family-friendly. Including investing in cargo bikes that can carry between 2 and 5 riders at the same time. 
+1.	Whereas casual users are recreational riders, the company should consider a thoughtful and strategic summer campaign that is family-friendly. Including investing in cargo bikes that can carry between 2 and 5 riders at the same time, which would allow families and friends to enjoy jolly rides together.
 2.	Develop campaign offerings that benefit seasonal memberships. The membership can be renewable every first month of the seasonal months (April or May) unless the member cancels the commitment.
 3.	Design a reward program for the busiest stations. The incentive program could provide membership discounts for new members, coffee, meal coupons and charity donations for the (top 20) busiest stations.
 
@@ -214,7 +210,7 @@ Cyclistic Bike-Share should launch a marketing campaign targeted at casual users
 
 Conclusion
 
-In the process of this case study, I consulted a number of sources that have contributed to largely to completing the work. The following refences were consulted:
+In the process of this case study, I consulted a number of sources that have contributed largely to completing the work. The following refences were consulted:
 
 Data License Agreement. https://divvybikes.com/data-license-agreement
 Dates and Times in R with Examples. https://sparkbyexamples.com/r-programming/dates-and-times-in-r/
