@@ -17,10 +17,15 @@ Cyclistic Bike-Share is a fictional and flexible ride-share company with three (
 Ask
 
 Business Plan: The future growth of Cyclistic Bike-Share hinges on maximizing its number of annual memberships in the Bike-Share company. Although, the plan is to convert casual membership to annual members, the team task is to first understand how annual members and casual members use Cyclistic bikes differently.
+
 Stakeholders in this report:
+
 Cyclistic Executive Team
+
 Director of Marketing - Lily Moreno
+
 Cyclistic’s Marketing Analytics Team
+
 
 
 
