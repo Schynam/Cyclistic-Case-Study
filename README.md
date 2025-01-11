@@ -4,7 +4,7 @@
 Introduction
 
 
-This study is the Google Data Analytics Capstone project which utilizes public data that is available under a [license agreement] (https://divvybikes.com/data-license-agreement) and by which this study abides.
+This study is the Google Data Analytics Capstone project which utilizes public data that is available under the license agreement (https://divvybikes.com/data-license-agreement) and by which this study abides.
 
 
 Background
