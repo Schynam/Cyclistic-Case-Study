@@ -213,8 +213,12 @@ Conclusion
 In the process of this case study, I consulted a number of sources that have contributed largely to completing the work. The following refences were consulted:
 
 Data License Agreement. https://divvybikes.com/data-license-agreement
+
 Dates and Times in R with Examples. https://sparkbyexamples.com/r-programming/dates-and-times-in-r/
+
 Divvy Exercise R Script. https://docs.google.com/document/d/1TzCqk59_J23D5zNCvwAPSgK-5osp-wVnifsc-VOpCaI/template/preview
+
 Statista.com. Leading months adults plan to travel on vacation in summer in the United States as of March 2022. https://www.statista.com/statistics/1316398/top-summer-travel-months-us/
+
 Wickham, H. 2009. Ggplot2. Elegant Graphics for Data Analysis. Springer.
 
