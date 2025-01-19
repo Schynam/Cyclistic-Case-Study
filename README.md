@@ -65,7 +65,7 @@ Structure of the table
 
 ![image](https://github.com/user-attachments/assets/08a35b0d-be12-4cf9-b7f9-4261f996f731)
 
-I also verified that there were just the two user types that will be considered in this case study. This information indicates that there were over 2.8 million trips by full members in the year in review, while casual trips numbers were slightly above 1.5 million trips. 
+I also verified that there were just the two user types that will be considered in this case study. This information indicates that there were over 2.8 million records by full members in the year in review, while casual trips numbers were slightly above 1.5 million records. 
 
 
 ![image](https://github.com/user-attachments/assets/bbf2e4ac-d89c-4cd1-a9fd-8db18ab1276a)
